@@ -1,2 +1,17 @@
 # DeepLearningProj3
-The repo for the third deep learning project
+The repository for Deep Learning Project 3 Spring 2020
+
+To access our code head over to [Here](https://github.com/SamGilb/DeepLearningProj3/edit/master/README.md)
+
+Install these libraries for RStudio using install.packages()
+* ggplot2
+* class
+* data.table
+* weightedROC
+
+# To Run Our Code
+To ensure expected behavior download all of the files and open them in RStudio
+
+For each file
+* press ctrl+a
+* ctrl + enter
