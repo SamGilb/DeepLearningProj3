@@ -1,7 +1,7 @@
 # DeepLearningProj3
 The repository for Deep Learning Project 3 Spring 2020
 
-To access our code head over to [Here](https://github.com/SamGilb/DeepLearningProj3/edit/master/README.md)
+To access our code head over to [Here](https://github.com/SamGilb/DeepLearningProj3)
 
 Install these libraries for RStudio using install.packages()
 * ggplot2
