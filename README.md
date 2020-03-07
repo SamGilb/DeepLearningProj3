@@ -15,3 +15,7 @@ To ensure expected behavior download all of the files and open them in RStudio
 For each file
 * press ctrl+a
 * ctrl + enter
+
+Saving the Main.R file for last
+
+When you get to the Main.R file follow the aforementioned steps and the program should run and produce similar plots
