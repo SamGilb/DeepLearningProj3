@@ -99,6 +99,8 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
     train.log.loss <- log(1 + exp(-pred.yt * pred.y))
     
     #loop through validation set and build validation.log.loss
+    if( n.validation.obs != 0)
+    {
     for( curr.validation.obs in 1:n.validation.obs )
     {
       #calculate pred.validation.y and pred.validation.yt
@@ -117,6 +119,7 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
     mean.train.log.loss[k] <- mean(train.log.loss)
     mean.validation.log.loss[k] <- mean(validation.log.loss)
     
+    }
   }
   #end of training
   
