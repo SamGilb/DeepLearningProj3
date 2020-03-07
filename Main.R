@@ -24,7 +24,16 @@ y.train <- y[!is.test]
 n.train.obs <- length(y.train)
 is.subtrain <- sample(rep(c(TRUE, TRUE, TRUE, FALSE, FALSE), ceiling(n.train.obs/5)), n.train.obs)
 
-NNetList <- NNetOneSplit( X.train, y.train, max.epochs = 5, step.size = 0.1, n.hidden.units = 20, is.subtrain )
+#run this boiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+NNetList <- NNetOneSplit( X.train, y.train, max.epochs = 30, step.size = 0.01, n.hidden.units = 20, is.subtrain )
+
+train.log.loss <- NNetList[[1]][[1]]
+validation.log.loss <- NNetList[[1]][[2]]
+
+print(NNetList[[1]])
+
+plot(1:length(train.log.loss), train.log.loss)
+plot(1:length(validation.log.loss), validation.log.loss)
 
 
 

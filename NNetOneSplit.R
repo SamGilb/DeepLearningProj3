@@ -11,6 +11,8 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
   pred.y.vec <- numeric()
   yt.vec <- numeric()
   pred.yt.vec <- numeric()
+  pred.validation.y.vec <- numeric()
+  pred.validation.yt.vec <- numeric()
   mean.train.log.loss <- numeric()
   mean.validation.log.loss <- numeric()
   
@@ -20,12 +22,12 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
   #X.subtrain and y.subtrain are the training data
   X.subtrain <- X.mat[ is.subtrain, ]
   y.subtrain <- y.vec[ is.subtrain ]
-  n.train.obs <- length( y.vec )
+  n.train.obs <- length( y.subtrain )
   
   #X.validation and y.validation is the test/validation data
   X.validation <- X.mat[ !is.subtrain, ]
-  y.validation <- X.mat[ !is.subtrain ]
-  n.validation.obs <- length( y.vec )
+  y.validation <- y.vec[ !is.subtrain ]
+  n.validation.obs <- length( y.validation )
   
   #V.mat is a matrix (n.features x n.hidden.units) used to predict hidden units given inputs
   #initialize V.mat with values close to 0
@@ -33,7 +35,7 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
   
   #w.vec is a weight vector (n.hidden.units) used to predict output given hidden units
   #initialize w.vec with values close to 0
-  w.vec <- rnorm( n.hidden.units )
+  w.vec <- as.matrix(rnorm( n.hidden.units ))
   
   for( k in 1:max.epochs )
   {
@@ -41,9 +43,10 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
     #for every epoc, iterate through all training observations
     for( curr.train.obs in 1:n.train.obs )
     {
+      
       #set aside current observation
       curr.y <- y.subtrain[ curr.train.obs ]
-      curr.X <- X.subtrain[ curr.train.obs, ]
+      curr.X <- as.matrix(X.subtrain[ curr.train.obs, ])
       
       #initialize y tilda
       curr.yt <- ifelse( curr.y == 1, 1, -1)
@@ -54,7 +57,7 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
       #########################################################################
       
       #Forward propogation
-      h.values <- sigmoid( t(V.mat) %*% curr.X )
+      h.values <- as.matrix(sigmoid( t(V.mat) %*% curr.X ))
       pred.y <- t(h.values) %*% w.vec
       
       #the predicted label is going to be 1 if pred.y is positive, 0 otherwise.
@@ -70,13 +73,19 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
       pred.yt.vec[curr.train.obs] <- pred.yt
       
       #Back propogation
-      w.vec.grad <- -pred.yt / (1 + exp(pred.yt * pred.y))
-      print(dim(w.vec.grad))
-      print(dim((h.values %*% w.vec.grad )))
-      print(dim(((h.values %*% w.vec.grad) * h.values * h.values)))
-      V.mat.grad <- (h.values %*% w.vec.grad ) %*% ((h.values %*% w.vec.grad) * h.values * h.values)
+      # w.vec.grad <- -pred.yt / (1 + exp(pred.yt * pred.y))
+      # V.mat.grad <- (h.values %*% w.vec.grad ) %*% ((h.values %*% w.vec.grad) * h.values * h.values)
+      grad.a <- -pred.yt / (1 + exp(pred.yt * pred.y))
+      w.vec.grad <- as.matrix(w.vec %*% grad.a)
+      
+      
+      grad.h <- w.vec %*% grad.a
+      h.vec <- as.matrix(h.values)
+      grad.a <- grad.h * h.vec * (1-h.vec)
+      V.mat.grad <- curr.X %*% t(grad.a)
       
       #adjust weight matrices
+      
       w.vec <- w.vec - step.size * w.vec.grad
       V.mat <- V.mat.grad - step.size * V.mat.grad
       
@@ -84,7 +93,7 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
     #end of epoch
     
     #calculate log loss for training
-    pred.y <- h.values %*% w.vec
+    pred.y <- t(h.values) %*% w.vec
     pred.yt <- ifelse(pred.y >0, 1, -1)
     #pred.yt <- if(pred.y >0){1}else{-1}
     train.log.loss <- log(1 + exp(-pred.yt * pred.y))
@@ -93,8 +102,8 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
     for( curr.validation.obs in 1:n.validation.obs )
     {
       #calculate pred.validation.y and pred.validation.yt
-      pred.validation.y <- w.vec %*% (sigmoid(t(V.mat) %*% X.validation[curr.validation.obs]))
-      pred.validation.y <- ifelse(pred.validation.y > 0, 1, -1)
+      pred.validation.y <- t(w.vec) %*% (sigmoid(t(V.mat) %*% X.validation[curr.validation.obs,]))
+      pred.validation.yt <- ifelse(pred.validation.y > 0, 1, -1)
       #pred.validation.yt <- if(pred.validation.y >0 ){1}else{-1}
       
       #store results in vector, later used for plotting
@@ -102,7 +111,7 @@ NNetOneSplit <- function( X.mat, y.vec, max.epochs, step.size, n.hidden.units, i
       pred.validation.yt.vec[curr.validation.obs] <- pred.validation.yt
     }
     #calculating validation log loss over all data points
-    validation.log.loss <- log(1 + exp(-pred.validation.yt.vec * pred.validation.y))
+    validation.log.loss <- log(1 + exp(-pred.validation.yt.vec * pred.validation.y.vec))
     
     #store the main log loss for this specific epoch
     mean.train.log.loss[k] <- mean(train.log.loss)
