@@ -5,7 +5,7 @@ To access our code head over to [Here](https://github.com/SamGilb/DeepLearningPr
 
 Install these libraries for RStudio using install.packages()
 * ggplot2
-* class
+* sigmoid
 * data.table
 * weightedROC
 
